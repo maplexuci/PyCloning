@@ -7,7 +7,7 @@ root = Tk()
 root.title("PyCloning")
 root.geometry("700x400")
 root.resizable(width=False, height=False)
-root.configure(bg="lightblue")
+root.configure(bg="#ebf5fc")
 root.columnconfigure(0, weight=2)
 root.columnconfigure((1,2), weight=1)
 
@@ -48,7 +48,7 @@ cloning_menu.add_command(label="NEBuilder® HiFi DNA Assembly")
 
 
 VERSION = "V0.1"
-ver_title = Label(root, text="PyCloning " + VERSION, font=("Courier", 24, "bold"), bg="lightblue")
+ver_title = Label(root, text="PyCloning " + VERSION, font=("Courier", 24, "bold"), bg="#ebf5fc")
 ver_title.grid(row=0, column=0, columnspan=3, padx=220, pady=10, sticky=E+W)
 
 logo = ImageTk.PhotoImage(Image.open("imgs/logo.jpg"))
@@ -65,11 +65,11 @@ btn_open = Button(root, image=pixelVirtual, width=35, height=35)
 btn_orf = Button(root, image=pixelVirtual, width=35, height=35)
 btn_import = Button(root, image=pixelVirtual, width=35, height=35)
 
-lbl_ndf = Label(root, text="New DNA File...", bg="lightblue")
-lbl_npf = Label(root, text="New Protein File...", bg="lightblue")
-lbl_open = Label(root, text="Open", bg="lightblue")
-lbl_orf = Label(root, text="Open Recent File", bg="lightblue")
-lbl_import = Label(root, text="Import", bg="lightblue")
+lbl_ndf = Label(root, text="New DNA File...", bg="#ebf5fc")
+lbl_npf = Label(root, text="New Protein File...", bg="#ebf5fc")
+lbl_open = Label(root, text="Open", bg="#ebf5fc")
+lbl_orf = Label(root, text="Open Recent File", bg="#ebf5fc")
+lbl_import = Label(root, text="Import", bg="#ebf5fc")
 
 btn_ndf.grid(row=1, column=1, pady=5)
 btn_npf.grid(row=2, column=1, pady=5)
