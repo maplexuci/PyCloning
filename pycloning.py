@@ -46,6 +46,18 @@ cloning_menu.add_command(label="Gibson Assembly®")
 cloning_menu.add_command(label="In-Fusion® Cloning")
 cloning_menu.add_command(label="NEBuilder® HiFi DNA Assembly")
 
+# Create 'Reference' menu
+ref_menu = Menu(menubar, tearoff=False)
+menubar.add_cascade(label="Reference", menu=ref_menu)
+ref_menu.add_command(label="Restriction Enzymes")
+ref_menu.add_command(label="Enzyme Database")
+cloning_menu.add_separator()
+ref_menu.add_command(label="Common Features")
+ref_menu.add_command(label="Letter Codes")
+cloning_menu.add_separator()
+ref_menu.add_command(label="Genetic Code Tables")
+ref_menu.add_command(label="Codon Usage Tables")
+
 
 VERSION = "V0.1"
 ver_title = Label(root, text="PyCloning " + VERSION, font=("Courier", 24, "bold"), bg="#ebf5fc")
