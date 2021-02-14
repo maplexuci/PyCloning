@@ -133,30 +133,39 @@ class Root:
             [type]: [description]
         """
         self.hide()
-        dna_window = Toplevel()
-        dna_window.title("New DNA File")
-        dna_window.geometry("600x500")
+        self.dna_window = Toplevel()
+        self.dna_window.title("New DNA File")
+        self.dna_window.geometry("600x500")
 
-        lbl = Label(dna_window, text="Input your sequence:")
+        lbl = Label(self.dna_window, text="Input your sequence:")
         lbl.pack(padx=10, pady=(10, 0), anchor=W)
 
-        dna_Text = Text(dna_window, wrap=WORD)
+        self.dna_Text = Text(self.dna_window, wrap=WORD)
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing.
-        dna_Text.pack(padx=10, pady=(0,20), expand=True, fill=BOTH, anchor=W)
+        self.dna_Text.pack(padx=10, pady=(0,20), expand=True, fill=BOTH, anchor=W)
 
         # Respons to the 'Cancel' button and close window event.
-        btn_cancel = Button(dna_window, text="Cancel", width=10,
-                            command=lambda: self.onClosing(dna_window))
+        btn_cancel = Button(self.dna_window, text="Cancel", width=10,
+                            command=lambda: self.onClosing(self.dna_window))
         btn_cancel.pack(padx=10, pady=10, side=RIGHT)
-        btn_ok = Button(dna_window, text="OK", width=10,
-                            command=lambda: self.readSeq)
+        btn_ok = Button(self.dna_window, text="OK", width=10,
+                            command=self.readSeq)
         btn_ok.pack(padx=10, pady=10, side=RIGHT)
-        dna_window.protocol("WM_DELETE_WINDOW", lambda: self.onClosing(dna_window))
+        self.dna_window.protocol("WM_DELETE_WINDOW",
+                            lambda: self.onClosing(self.dna_window))
 
         return None
 
-    def readSeq():
+    def readSeq(self):
+        self.dnaSeq = Seq(self.dna_Text.get(1.0, END))
+        self.dna_window.destroy()
+        self.seq_window = Toplevel()
+        self.seq_window.title("file name")
+        self.seq_window.state('zoomed')
+        self.seq_window.protocol("WM_DELETE_WINDOW",
+                            lambda: self.onClosing(self.seq_window))
+
         pass
 
 
