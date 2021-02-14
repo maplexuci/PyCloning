@@ -4,13 +4,16 @@ from PIL import ImageTk, Image
 
 
 def main():
+    """The main app function"""
     root = Tk()
     root_window = Root(root)
     return None
 
 
 class Root:
-
+    """Root window class including the widgets and the functions for 
+    responding the widgets.
+    """
     def __init__(self, root):
         # Main root window configration
         self.root = root
@@ -108,20 +111,27 @@ class Root:
         self.root.mainloop()
 
     def hide(self):
-        """"""
+        """Hide the root window."""
         self.root.withdraw()
 
-    def onClosing(self, window):
-        """"""
-        window.destroy()
-        self.show()
-
     def show(self):
-        """"""
+        """Show the root window from the hide status"""
         self.root.update()
         self.root.deiconify()
 
+    def onClosing(self, window):
+        """Respond to the toplevle window closing event:
+        Close the current window and show the root window.
+        """
+        window.destroy()
+        self.show()
+
     def new_DNA(self):
+        """Create new toplevel window for new DNA file
+
+        Returns:
+            [type]: [description]
+        """
         self.hide()
         dna_window = Toplevel()
         dna_window.title("New DNA File")
@@ -131,15 +141,23 @@ class Root:
         lbl.pack(padx=10, pady=(10, 0), anchor=W)
 
         dna_Text = Text(dna_window, wrap=WORD)
-        # 'expand=YES' and 'fill=BOTH' make sure 
-        # the Text change size along with window resizing.
-        dna_Text.pack(padx=10, pady=(0,20), expand=YES, fill=BOTH, anchor=W)
+        # 'expand=True' and 'fill=BOTH' ensure that
+        # the Text widget change size along with window resizing.
+        dna_Text.pack(padx=10, pady=(0,20), expand=True, fill=BOTH, anchor=W)
 
-        handler = lambda: self.onClosing(dna_window)
-        btn_cancel = Button(dna_window, text="Cancel", command=handler)
-        btn_cancel.pack(padx=10, pady=10, anchor=E)
-        dna_window.protocol("WM_DELETE_WINDOW", handler)
+        # Respons to the 'Cancel' button and close window event.
+        btn_cancel = Button(dna_window, text="Cancel", width=10,
+                            command=lambda: self.onClosing(dna_window))
+        btn_cancel.pack(padx=10, pady=10, side=RIGHT)
+        btn_ok = Button(dna_window, text="OK", width=10,
+                            command=lambda: self.readSeq)
+        btn_ok.pack(padx=10, pady=10, side=RIGHT)
+        dna_window.protocol("WM_DELETE_WINDOW", lambda: self.onClosing(dna_window))
 
         return None
+
+    def readSeq():
+        pass
+
 
 main()
