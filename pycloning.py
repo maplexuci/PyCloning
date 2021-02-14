@@ -28,7 +28,7 @@ class Root:
         # Create 'File' menu
         file_menu = Menu(menubar, tearoff=False)
         menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="New DNA File...")
+        file_menu.add_command(label="New DNA File...", command=self.new_DNA)
         file_menu.add_command(label="New Protein File...")
         file_menu.add_separator()
         file_menu.add_command(label="Open Files...")
@@ -106,5 +106,40 @@ class Root:
         lbl_import.grid(row=5, column=2, pady=10, sticky=W)
 
         self.root.mainloop()
+
+    def hide(self):
+        """"""
+        self.root.withdraw()
+
+    def onClosing(self, window):
+        """"""
+        window.destroy()
+        self.show()
+
+    def show(self):
+        """"""
+        self.root.update()
+        self.root.deiconify()
+
+    def new_DNA(self):
+        self.hide()
+        dna_window = Toplevel()
+        dna_window.title("New DNA File")
+        dna_window.geometry("600x500")
+
+        lbl = Label(dna_window, text="Input your sequence:")
+        lbl.pack(padx=10, pady=(10, 0), anchor=W)
+
+        dna_Text = Text(dna_window, wrap=WORD)
+        # 'expand=YES' and 'fill=BOTH' make sure 
+        # the Text change size along with window resizing.
+        dna_Text.pack(padx=10, pady=(0,20), expand=YES, fill=BOTH, anchor=W)
+
+        handler = lambda: self.onClosing(dna_window)
+        btn_cancel = Button(dna_window, text="Cancel", command=handler)
+        btn_cancel.pack(padx=10, pady=10, anchor=E)
+        dna_window.protocol("WM_DELETE_WINDOW", handler)
+
+        return None
 
 main()
