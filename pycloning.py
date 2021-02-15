@@ -136,14 +136,24 @@ class Root:
         self.dna_window = Toplevel()
         self.dna_window.title("New DNA File")
         self.dna_window.geometry("600x500")
+        # 'grab_set()' and `focus()` ensure the toplevel is active (focused).
+        self.dna_window.grab_set()
+        self.dna_window.focus()
 
         lbl = Label(self.dna_window, text="Input your sequence:")
         lbl.pack(padx=10, pady=(10, 0), anchor=W)
 
-        self.dna_Text = Text(self.dna_window, wrap=WORD)
+        self.scroller = Scrollbar(self.dna_window, orient=VERTICAL)
+        self.scroller.pack(padx=(0, 10), side=RIGHT, fill=Y, expand=False)
+
+        self.dna_Text = Text(self.dna_window, wrap=WORD, yscrollcommand=self.scroller.set)
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing.
-        self.dna_Text.pack(padx=10, pady=(0,20), expand=True, fill=BOTH, anchor=W)
+        self.dna_Text.pack(padx=(10, 0), pady=(0,20), expand=True, fill=BOTH, anchor=W)
+        self.dna_Text.focus()
+
+        # Configure the scrollbar.
+        self.scroller.config(command=self.dna_Text.yview)
 
         # Respons to the 'Cancel' button and close window event.
         btn_cancel = Button(self.dna_window, text="Cancel", width=10,
@@ -158,11 +168,11 @@ class Root:
         return None
 
     def readSeq(self):
-        self.dnaSeq = Seq(self.dna_Text.get(1.0, END))
+        self.dnaSeq = Seq(self.dna_Text.get(1.0, END))  # '1.0' means the first row (number), the first column (index).
         self.dna_window.destroy()
         self.seq_window = Toplevel()
         self.seq_window.title("file name")
-        self.seq_window.state('zoomed')
+        self.seq_window.state('zoomed')  # Make the window maximized.
         self.seq_window.protocol("WM_DELETE_WINDOW",
                             lambda: self.onClosing(self.seq_window))
 
