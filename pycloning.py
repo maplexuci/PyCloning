@@ -1,5 +1,6 @@
 from Bio.Seq import Seq
 from tkinter import *
+from tkinter import scrolledtext
 from PIL import ImageTk, Image
 
 
@@ -135,7 +136,7 @@ class Root:
         self.hide()
         self.dna_window = Toplevel()
         self.dna_window.title("New DNA File")
-        self.dna_window.geometry("600x500")
+        self.dna_window.geometry("500x400")
         # 'grab_set()' and `focus()` ensure the toplevel is active (focused).
         self.dna_window.grab_set()
         self.dna_window.focus()
@@ -143,17 +144,12 @@ class Root:
         lbl = Label(self.dna_window, text="Input your sequence:")
         lbl.pack(padx=10, pady=(10, 0), anchor=W)
 
-        self.scroller = Scrollbar(self.dna_window, orient=VERTICAL)
-        self.scroller.pack(padx=(0, 10), side=RIGHT, fill=Y, expand=False)
-
-        self.dna_Text = Text(self.dna_window, wrap=WORD, yscrollcommand=self.scroller.set)
+        # Create a scrolledtext widget.
+        self.scrolledtext = scrolledtext.ScrolledText(self.dna_window, wrap=WORD, width=80, height=15, font=("Courier New", 11))
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing.
-        self.dna_Text.pack(padx=(10, 0), pady=(0,20), expand=True, fill=BOTH, anchor=W)
-        self.dna_Text.focus()
-
-        # Configure the scrollbar.
-        self.scroller.config(command=self.dna_Text.yview)
+        self.scrolledtext.pack(padx=10, pady=(0, 20), expand=True, fill=BOTH, anchor=W)
+        self.scrolledtext.focus()
 
         # Respons to the 'Cancel' button and close window event.
         btn_cancel = Button(self.dna_window, text="Cancel", width=10,
