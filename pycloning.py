@@ -145,11 +145,16 @@ class Root:
         lbl.pack(padx=10, pady=(10, 0), anchor=W)
 
         # Create a scrolledtext widget.
-        self.scrolledtext = scrolledtext.ScrolledText(self.dna_window, wrap=WORD, width=80, height=15, font=("Courier New", 11))
+        self.dna_seq = scrolledtext.ScrolledText(self.dna_window, wrap=WORD, width=80, height=15, font=("Courier New", 11))
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing.
-        self.scrolledtext.pack(padx=10, pady=(0, 20), expand=True, fill=BOTH, anchor=W)
-        self.scrolledtext.focus()
+        self.dna_seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
+        self.dna_seq.focus_set()
+        self.dna_seq.bind('<<Modified>>', self.changed)
+
+        # Add another Label widget to display the sequence length.
+        self.seq_len_lbl = Label(self.dna_window)
+        self.seq_len_lbl.pack(padx=10, anchor=W)
 
         # Respons to the 'Cancel' button and close window event.
         btn_cancel = Button(self.dna_window, text="Cancel", width=10,
@@ -163,8 +168,17 @@ class Root:
 
         return None
 
+    def changed(self, seq=None):
+        """Function to keep track the changes in Text and reflect the changes in the Label"""
+        self.text = ''
+        self.flag = self.dna_seq.edit_modified()
+        if self.flag == 1:     # prevent from getting called twice
+            self.text = str(len(self.dna_seq.get(1.0, END))) + " bp"
+            self.seq_len_lbl.config(text=self.text)
+            self.flag = self.dna_seq.edit_modified(False)  # Reset the flag to 0.
+
     def readSeq(self):
-        self.dnaSeq = Seq(self.dna_Text.get(1.0, END))  # '1.0' means the first row (number), the first column (index).
+        self.dnaSeq = Seq(self.dna_seq.get(1.0, END))  # '1.0' means the first row (number), the first column (index).
         self.dna_window.destroy()
         self.seq_window = Toplevel()
         self.seq_window.title("file name")
@@ -172,7 +186,7 @@ class Root:
         self.seq_window.protocol("WM_DELETE_WINDOW",
                             lambda: self.onClosing(self.seq_window))
 
-        pass
+        print(self.dnaSeq)
 
 
 main()
