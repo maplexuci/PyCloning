@@ -12,8 +12,8 @@ def main():
 
 
 class Root:
-    """Root window class including the widgets and the functions for 
-    responding the widgets.
+    """Root window class including the widgets and the functions
+    for responding the widgets.
     """
     def __init__(self, root):
         # Main root window configration
@@ -25,89 +25,91 @@ class Root:
         self.root.columnconfigure(0, weight=2)
         self.root.columnconfigure((1, 2), weight=1)
 
-        # Create menu bar
-        menubar = Menu(self.root)
-        self.root.config(menu=menubar)
+        # Create menubar first
+        self.menubar = Menu(self.root)
+        self.root.config(menu=self.menubar)
 
-        # Create 'File' menu
-        file_menu = Menu(menubar, tearoff=False)
-        menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="New DNA File...", command=self.new_DNA)
-        file_menu.add_command(label="New Protein File...")
-        file_menu.add_separator()
-        file_menu.add_command(label="Open Files...")
-        file_menu.add_command(label="Open Recent File")
-        file_menu.add_command(label="Close", command=quit)
-        file_menu.add_separator()
-        file_menu.add_command(label="Import")
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=quit)
+        # Create 'File' menu inside the menubar
+        # 'tearoff=False' ensures the menu is not a floatting menu
+        self.file_menu = Menu(self.menubar, tearoff=False)
+        # Adding cascade to 'File' menu.
+        self.menubar.add_cascade(label="File", menu=self.file_menu)
+        self.file_menu.add_command(label="New DNA File...", command=self.new_DNA)
+        self.file_menu.add_command(label="New Protein File...")
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Open Files...")
+        self.file_menu.add_command(label="Open Recent File")
+        self.file_menu.add_command(label="Close", command=quit)
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Import")
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Exit", command=quit)
 
         # Create 'Cloning' menu
-        cloning_menu = Menu(menubar, tearoff=False)
-        menubar.add_cascade(label="Cloning", menu=cloning_menu)
-        cloning_menu.add_command(label="PCR...")
-        cloning_menu.add_command(label="Overlapping PCR")
-        cloning_menu.add_command(label="Mutagenesis...")
-        cloning_menu.add_separator()
-        cloning_menu.add_command(label="Restriction Enzyme Cloning")
-        cloning_menu.add_command(label="Linear Ligation")
-        cloning_menu.add_separator()
-        cloning_menu.add_command(label="TA or GC Cloning")
-        cloning_menu.add_command(label="TOPO® Cloning")
-        cloning_menu.add_command(label="Gateway® Cloning")
-        cloning_menu.add_command(label="Gibson Assembly®")
-        cloning_menu.add_command(label="In-Fusion® Cloning")
-        cloning_menu.add_command(label="NEBuilder® HiFi DNA Assembly")
+        self.cloning_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Cloning", menu=self.cloning_menu)
+        self.cloning_menu.add_command(label="PCR...")
+        self.cloning_menu.add_command(label="Overlapping PCR")
+        self.cloning_menu.add_command(label="Mutagenesis...")
+        self.cloning_menu.add_separator()
+        self.cloning_menu.add_command(label="Restriction Enzyme Cloning")
+        self.cloning_menu.add_command(label="Linear Ligation")
+        self.cloning_menu.add_separator()
+        self.cloning_menu.add_command(label="TA or GC Cloning")
+        self.cloning_menu.add_command(label="TOPO® Cloning")
+        self.cloning_menu.add_command(label="Gateway® Cloning")
+        self.cloning_menu.add_command(label="Gibson Assembly®")
+        self.cloning_menu.add_command(label="In-Fusion® Cloning")
+        self.cloning_menu.add_command(label="NEBuilder® HiFi DNA Assembly")
 
         # Create 'Reference' menu
-        ref_menu = Menu(menubar, tearoff=False)
-        menubar.add_cascade(label="Reference", menu=ref_menu)
-        ref_menu.add_command(label="Restriction Enzymes")
-        ref_menu.add_command(label="Enzyme Database")
-        ref_menu.add_separator()
-        ref_menu.add_command(label="Common Features")
-        ref_menu.add_command(label="Letter Codes")
-        ref_menu.add_separator()
-        ref_menu.add_command(label="Genetic Code Tables")
-        ref_menu.add_command(label="Codon Usage Tables")
+        self.ref_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Reference", menu=self.ref_menu)
+        self.ref_menu.add_command(label="Restriction Enzymes")
+        self.ref_menu.add_command(label="Enzyme Database")
+        self.ref_menu.add_separator()
+        self.ref_menu.add_command(label="Common Features")
+        self.ref_menu.add_command(label="Letter Codes")
+        self.ref_menu.add_separator()
+        self.ref_menu.add_command(label="Genetic Code Tables")
+        self.ref_menu.add_command(label="Codon Usage Tables")
 
-        VERSION = "V0.1"
-        ver_title = Label(self.root, text="PyCloning " + VERSION, font=("Courier", 24, "bold"), bg="#ebf5fc")
-        ver_title.grid(row=0, column=0, columnspan=3, padx=220, pady=10, sticky=E+W)
+        self.VERSION = "V0.1"
+        self.ver_title = Label(self.root, text="PyCloning " + VERSION, font=("Courier", 24, "bold"), bg="#ebf5fc")
+        self.ver_title.grid(row=0, column=0, columnspan=3, padx=220, pady=10, sticky=E+W)
 
-        canvas = Canvas(self.root, bg="#ebf5fc", highlightthickness=0, width=260, height=260)
-        canvas.grid(row=1, column=0, rowspan=5, padx=3, pady=9)
-        logo = ImageTk.PhotoImage(Image.open("imgs/logo.png"))
-        canvas.create_image(130, 130, image=logo)
+        self.canvas = Canvas(self.root, bg="#ebf5fc", highlightthickness=0, width=260, height=260)
+        self.canvas.grid(row=1, column=0, rowspan=5, padx=3, pady=9)
+        self.logo = ImageTk.PhotoImage(Image.open("imgs/logo.png"))
+        self.canvas.create_image(130, 130, image=logo)
 
-        status = Label(self.root, bd=1, relief=SUNKEN, height=3)
-        status.grid(row=6, column=0, columnspan=3, sticky=W+E)
+        self.status = Label(self.root, bd=1, relief=SUNKEN, height=3)
+        self.status.grid(row=6, column=0, columnspan=3, sticky=W+E)
 
-        pixelVirtual = PhotoImage(width=1, height=1)
-        btn_ndf = Button(self.root, image=pixelVirtual, width=35, height=35)
-        btn_npf = Button(self.root, image=pixelVirtual, width=35, height=35)
-        btn_open = Button(self.root, image=pixelVirtual, width=35, height=35)
-        btn_orf = Button(self.root, image=pixelVirtual, width=35, height=35)
-        btn_import = Button(self.root, image=pixelVirtual, width=35, height=35)
+        self.pixelVirtual = PhotoImage(width=1, height=1)
+        self.btn_ndf = Button(self.root, image=self.pixelVirtual, width=35, height=35)
+        self.btn_npf = Button(self.root, image=self.pixelVirtual, width=35, height=35)
+        self.btn_open = Button(self.root, image=self.pixelVirtual, width=35, height=35)
+        self.btn_orf = Button(self.root, image=self.pixelVirtual, width=35, height=35)
+        self.btn_import = Button(self.root, image=self.pixelVirtual, width=35, height=35)
 
-        lbl_ndf = Label(self.root, text="New DNA File...", bg="#ebf5fc")
-        lbl_npf = Label(self.root, text="New Protein File...", bg="#ebf5fc")
-        lbl_open = Label(self.root, text="Open", bg="#ebf5fc")
-        lbl_orf = Label(self.root, text="Open Recent File", bg="#ebf5fc")
-        lbl_import = Label(self.root, text="Import", bg="#ebf5fc")
+        self.lbl_ndf = Label(self.root, text="New DNA File...", bg="#ebf5fc")
+        self.lbl_npf = Label(self.root, text="New Protein File...", bg="#ebf5fc")
+        self.lbl_open = Label(self.root, text="Open", bg="#ebf5fc")
+        self.lbl_orf = Label(self.root, text="Open Recent File", bg="#ebf5fc")
+        self.lbl_import = Label(self.root, text="Import", bg="#ebf5fc")
 
-        btn_ndf.grid(row=1, column=1, pady=5)
-        btn_npf.grid(row=2, column=1, pady=5)
-        btn_open.grid(row=3, column=1, pady=5)
-        btn_orf.grid(row=4, column=1, pady=5)
-        btn_import.grid(row=5, column=1, pady=5)
+        self.btn_ndf.grid(row=1, column=1, pady=5)
+        self.btn_npf.grid(row=2, column=1, pady=5)
+        self.btn_open.grid(row=3, column=1, pady=5)
+        self.btn_orf.grid(row=4, column=1, pady=5)
+        self.btn_import.grid(row=5, column=1, pady=5)
 
-        lbl_ndf.grid(row=1, column=2, pady=10, sticky=W)
-        lbl_npf.grid(row=2, column=2, pady=10, sticky=W)
-        lbl_open.grid(row=3, column=2, pady=10, sticky=W)
-        lbl_orf.grid(row=4, column=2, pady=10, sticky=W)
-        lbl_import.grid(row=5, column=2, pady=10, sticky=W)
+        self.lbl_ndf.grid(row=1, column=2, pady=10, sticky=W)
+        self.lbl_npf.grid(row=2, column=2, pady=10, sticky=W)
+        self.lbl_open.grid(row=3, column=2, pady=10, sticky=W)
+        self.lbl_orf.grid(row=4, column=2, pady=10, sticky=W)
+        self.lbl_import.grid(row=5, column=2, pady=10, sticky=W)
 
         self.root.mainloop()
 
@@ -145,11 +147,16 @@ class Root:
         lbl.pack(padx=10, pady=(10, 0), anchor=W)
 
         # Create a scrolledtext widget.
-        self.new_dna_seq = scrolledtext.ScrolledText(self.dna_window, wrap=WORD, width=80, height=15, font=("Courier New", 11))
+        self.new_dna_seq = scrolledtext.ScrolledText(
+                                self.dna_window, wrap=WORD,
+                                width=80, height=15, font=("Courier New", 11)
+                                )
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing.
         self.new_dna_seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
         self.new_dna_seq.focus_set()
+        # Bind the scrooedtext widget with 'self.changed' function
+        # to keep track if the content in the widget is 'Modified'.
         self.new_dna_seq.bind('<<Modified>>', self.changed)
 
         # Add another Label widget to display the sequence length.
@@ -157,23 +164,25 @@ class Root:
         self.seq_len_lbl.pack(padx=10, anchor=W)
 
         # Add Label and Entry widget in a Frame for entering filename.
+        # First, create Frame widget
         self.filename_Frame = Frame(self.dna_window)
+        # Create text Label
         Label(self.filename_Frame, text="File Name: ").pack(side=LEFT)
+        # Define and use variable type for Entry widget.
         self.name_var = StringVar()
         self.seq_filename = Entry(self.filename_Frame, textvariable=self.name_var)
         self.seq_filename.pack(side=LEFT)
+        # Pack the Frame in the end after all widgets in Frame are packed.
         self.filename_Frame.pack(padx=10, anchor=W)
 
         # Respond to the 'Cancel' button.
         btn_cancel = Button(self.dna_window, text="Cancel", width=10,
                             command=lambda: self.onClosing(self.dna_window))
         btn_cancel.pack(padx=10, pady=10, side=RIGHT)
-
         # Add 'OK' button to read sequence
         btn_ok = Button(self.dna_window, text="OK", width=10,
                             command=self.readSeq)
         btn_ok.pack(padx=10, pady=10, side=RIGHT)
-
         #  Respond to 'close window' event
         self.dna_window.protocol("WM_DELETE_WINDOW",
                             lambda: self.onClosing(self.dna_window))
@@ -193,7 +202,7 @@ class Root:
         """Get the content in an Entry as string.
 
         Args:
-            name_var ([type]): The variable type defined for the Entry.
+            name_var (var): The variable type defined for the Entry.
 
         Returns:
             Str: The content in an Entry widget.
@@ -217,8 +226,6 @@ class Root:
         self.dna_seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
         self.dna_seq.insert(1.0, self.dnaSeq)
         # self.dna_seq.bind('<<Modified>>', self.changed)
-
-        
 
 
 main()
