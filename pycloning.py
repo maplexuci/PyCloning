@@ -75,13 +75,13 @@ class Root:
         self.ref_menu.add_command(label="Codon Usage Tables")
 
         self.VERSION = "V0.1"
-        self.ver_title = Label(self.root, text="PyCloning " + VERSION, font=("Courier", 24, "bold"), bg="#ebf5fc")
+        self.ver_title = Label(self.root, text="PyCloning " + self.VERSION, font=("Courier", 24, "bold"), bg="#ebf5fc")
         self.ver_title.grid(row=0, column=0, columnspan=3, padx=220, pady=10, sticky=E+W)
 
         self.canvas = Canvas(self.root, bg="#ebf5fc", highlightthickness=0, width=260, height=260)
         self.canvas.grid(row=1, column=0, rowspan=5, padx=3, pady=9)
         self.logo = ImageTk.PhotoImage(Image.open("imgs/logo.png"))
-        self.canvas.create_image(130, 130, image=logo)
+        self.canvas.create_image(130, 130, image=self.logo)
 
         self.status = Label(self.root, bd=1, relief=SUNKEN, height=3)
         self.status.grid(row=6, column=0, columnspan=3, sticky=W+E)
@@ -165,15 +165,15 @@ class Root:
 
         # Add Label and Entry widget in a Frame for entering filename.
         # First, create Frame widget
-        self.filename_Frame = Frame(self.dna_window)
+        filename_Frame = Frame(self.dna_window)
         # Create text Label
-        Label(self.filename_Frame, text="File Name: ").pack(side=LEFT)
+        Label(filename_Frame, text="File Name: ").pack(side=LEFT)
         # Define and use variable type for Entry widget.
         self.name_var = StringVar()
-        self.seq_filename = Entry(self.filename_Frame, textvariable=self.name_var)
-        self.seq_filename.pack(side=LEFT)
+        seq_filename = Entry(filename_Frame, textvariable=self.name_var)
+        seq_filename.pack(side=LEFT)
         # Pack the Frame in the end after all widgets in Frame are packed.
-        self.filename_Frame.pack(padx=10, anchor=W)
+        filename_Frame.pack(padx=10, anchor=W)
 
         # Respond to the 'Cancel' button.
         btn_cancel = Button(self.dna_window, text="Cancel", width=10,
@@ -181,7 +181,7 @@ class Root:
         btn_cancel.pack(padx=10, pady=10, side=RIGHT)
         # Add 'OK' button to read sequence
         btn_ok = Button(self.dna_window, text="OK", width=10,
-                            command=self.readSeq)
+                        command=self.readSeq)
         btn_ok.pack(padx=10, pady=10, side=RIGHT)
         #  Respond to 'close window' event
         self.dna_window.protocol("WM_DELETE_WINDOW",
@@ -192,11 +192,11 @@ class Root:
     def changed(self, seq=None):
         """Function to keep track the changes in Text and reflect the changes in the Label"""
         text = ''
-        self.flag = self.new_dna_seq.edit_modified()
-        if self.flag == 1:     # prevent from getting called twice
+        flag = self.new_dna_seq.edit_modified()
+        if flag == 1:     # prevent from getting called twice
             text = str(len(self.new_dna_seq.get(1.0, END))) + " bp"
             self.seq_len_lbl.config(text=text)
-            self.flag = self.new_dna_seq.edit_modified(False)  # Reset the flag to 0.
+            flag = self.new_dna_seq.edit_modified(False)  # Reset the flag to 0.
 
     def get_EntryContent(self, text_var):
         """Get the content in an Entry as string.
@@ -225,7 +225,6 @@ class Root:
         # the Text widget change size along with window resizing.
         self.dna_seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
         self.dna_seq.insert(1.0, self.dnaSeq)
-        # self.dna_seq.bind('<<Modified>>', self.changed)
 
 
 main()
