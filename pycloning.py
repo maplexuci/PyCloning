@@ -185,7 +185,7 @@ class Root:
         btn_ok.pack(padx=10, pady=10, side=RIGHT)
         #  Respond to 'close window' event
         self.dna_window.protocol("WM_DELETE_WINDOW",
-                            lambda: self.onClosing(self.dna_window))
+                                 lambda: self.onClosing(self.dna_window))
 
         return None
 
@@ -194,7 +194,7 @@ class Root:
         text = ''
         flag = self.new_dna_seq.edit_modified()
         if flag == 1:     # prevent from getting called twice
-            text = str(len(self.new_dna_seq.get(1.0, END))) + " bp"
+            text = str(len(self.new_dna_seq.get(1.0, END).rstrip())) + " bp"
             self.seq_len_lbl.config(text=text)
             flag = self.new_dna_seq.edit_modified(False)  # Reset the flag to 0.
 
@@ -217,14 +217,16 @@ class Root:
         self.seq_window.title(self.get_EntryContent(self.name_var))
         self.seq_window.state('zoomed')  # Make the window maximized.
         self.seq_window.protocol("WM_DELETE_WINDOW",
-                            lambda: self.onClosing(self.seq_window))
+                                 lambda: self.onClosing(self.seq_window))
 
         # Create a scrolledtext widget.
-        self.dna_seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD, font=("Courier New", 11))
+        self.dna_seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
+                                                 font=("Courier New", 11))
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing.
         self.dna_seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
         self.dna_seq.insert(1.0, self.dnaSeq)
 
 
-main()
+if __name__ == '__main__':
+    main()
