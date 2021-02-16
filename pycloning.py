@@ -156,6 +156,18 @@ class Root:
         self.seq_len_lbl = Label(self.dna_window)
         self.seq_len_lbl.pack(padx=10, anchor=W)
 
+        # Add Label and Entry widget in a Frame for inputting filename.
+        self.filename_Frame = Frame(self.dna_window)
+        Label(self.filename_Frame, text="File Name: ").pack(side=LEFT)
+        self.seq_filename = Entry(self.filename_Frame)
+        self.seq_filename.pack(side=LEFT)
+        self.filename_Frame.pack(padx=10, anchor=W)
+
+        # self.seq_filename = Entry(self.dna_window)
+        # self.seq_filename.pack()
+
+        # self.blank_label = Label(self.dna_window).pack(pady=10)
+
         # Respons to the 'Cancel' button and close window event.
         btn_cancel = Button(self.dna_window, text="Cancel", width=10,
                             command=lambda: self.onClosing(self.dna_window))
@@ -177,11 +189,15 @@ class Root:
             self.seq_len_lbl.config(text=text)
             self.flag = self.new_dna_seq.edit_modified(False)  # Reset the flag to 0.
 
+    def get_filename(self, event=None):
+        return self.seq_filename.get()
+
+
     def readSeq(self):
         self.dnaSeq = Seq(self.new_dna_seq.get(1.0, END))  # '1.0' means the first row (number), the first column (index).
         self.dna_window.destroy()
         self.seq_window = Toplevel()
-        self.seq_window.title("file name")
+        self.seq_window.title(self.get_filename())
         self.seq_window.state('zoomed')  # Make the window maximized.
         self.seq_window.protocol("WM_DELETE_WINDOW",
                             lambda: self.onClosing(self.seq_window))
