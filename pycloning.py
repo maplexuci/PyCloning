@@ -233,6 +233,9 @@ class Root:
                 self.new_dna_seq.delete(1.0, END)
                 self.new_dna_seq.insert(1.0, seq.replace(letter, ''))
 
+                # Update seq to ensure loops through the whole sequence.
+                seq = self.new_dna_seq.get(1.0, END).rstrip()
+
     def get_EntryContent(self, text_var):
         """Get the content in an Entry as string.
 
