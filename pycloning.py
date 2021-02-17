@@ -149,8 +149,9 @@ class Root:
         # Create a scrolledtext widget.
         self.new_dna_seq = scrolledtext.ScrolledText(
                                 self.dna_window, wrap=WORD,
-                                width=80, height=15, font=("Courier New", 11)
+                                width=80, height=15, font=("Courier New", 11),
                                 )
+
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing.
         self.new_dna_seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
@@ -158,6 +159,7 @@ class Root:
         # Bind the scrooedtext widget with 'self.changed' function
         # to keep track if the content in the widget is 'Modified'.
         self.new_dna_seq.bind('<<Modified>>', self.changed)
+        self.new_dna_seq.bind('<KeyRelease>', self.onValidate)
 
         # Add another Label widget to display the sequence length.
         self.seq_len_lbl = Label(self.dna_window)
@@ -180,9 +182,9 @@ class Root:
                             command=lambda: self.onClosing(self.dna_window))
         btn_cancel.pack(padx=10, pady=10, side=RIGHT)
         # Add 'OK' button to read sequence
-        btn_ok = Button(self.dna_window, text="OK", width=10, state=DISABLED,
+        self.btn_ok = Button(self.dna_window, text="OK", width=10, state=DISABLED,
                         command=self.readSeq)
-        btn_ok.pack(padx=10, pady=10, side=RIGHT)
+        self.btn_ok.pack(padx=10, pady=10, side=RIGHT)
         #  Respond to 'close window' event
         self.dna_window.protocol("WM_DELETE_WINDOW",
                                  lambda: self.onClosing(self.dna_window))
@@ -194,16 +196,42 @@ class Root:
         # Only display the length of sequence when it is not empty.
         text = ''
         text_len = len(self.new_dna_seq.get(1.0, END).rstrip())
-        if text_len != 0:
-            text = f"{str(text_len)} bp"
-        else:
-            text = ''
+        self.flag = self.new_dna_seq.edit_modified()
+        if self.flag == 1:
+            if text_len != 0:
+                text = f"{str(text_len)} bp"
+            else:
+                text = ''
 
-        # Display the sequence length on the Label.
-        self.seq_len_lbl.config(text=text)
-        
-        # Reset the modified flag to False, for detecting new modification.
-        self.new_dna_seq.edit_modified(False)
+            # Display the sequence length on the Label.
+            # We need to display it first before reset
+            # the modification flag to 0.
+            # otherwise, it won't display, because the reset statement
+            # immediately call the changed() function and the condition in
+            # if statement will not meet.
+            self.seq_len_lbl.config(text=text)
+
+            # Reset the modified flag to False (0), for detecting
+            # new modification. Note that, this also means the modification
+            # state is changes again, so, this will call the changed()
+            # function once again. How ever, we set a control condition
+            # 'if self.flag == 1', this will ensure the code inside of this
+            # contition statement not excecute again.
+            self.new_dna_seq.edit_modified(False)        
+
+    def onValidate(self, event):
+        char = ('A', 'a', 'T', 't', 'G', 'g', 'C', 'c', 'W', 'w', 'S', 's',
+                'M', 'm', 'K', 'k', 'R', 'r', 'Y', 'y', 'B', 'b', 'D', 'd',
+                'H', 'h' 'V', 'v', 'N', 'n')
+        seq = self.new_dna_seq.get(1.0, END).rstrip()
+        if len(seq) != 0:
+            self.btn_ok.config(state=NORMAL)
+        else:
+            self.btn_ok.config(state=DISABLED)
+        for letter in seq:
+            if letter not in char:
+                self.new_dna_seq.delete(1.0, END)
+                self.new_dna_seq.insert(1.0, seq.replace(letter, ''))
 
     def get_EntryContent(self, text_var):
         """Get the content in an Entry as string.
