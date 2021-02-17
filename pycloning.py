@@ -180,7 +180,7 @@ class Root:
                             command=lambda: self.onClosing(self.dna_window))
         btn_cancel.pack(padx=10, pady=10, side=RIGHT)
         # Add 'OK' button to read sequence
-        btn_ok = Button(self.dna_window, text="OK", width=10,
+        btn_ok = Button(self.dna_window, text="OK", width=10, state=DISABLED,
                         command=self.readSeq)
         btn_ok.pack(padx=10, pady=10, side=RIGHT)
         #  Respond to 'close window' event
@@ -189,14 +189,21 @@ class Root:
 
         return None
 
-    def changed(self, seq=None):
+    def changed(self, event):
         """Function to keep track the changes in Text and reflect the changes in the Label"""
+        # Only display the length of sequence when it is not empty.
         text = ''
-        flag = self.new_dna_seq.edit_modified()
-        if flag == 1:     # prevent from getting called twice
-            text = str(len(self.new_dna_seq.get(1.0, END).rstrip())) + " bp"
-            self.seq_len_lbl.config(text=text)
-            flag = self.new_dna_seq.edit_modified(False)  # Reset the flag to 0.
+        text_len = len(self.new_dna_seq.get(1.0, END).rstrip())
+        if text_len != 0:
+            text = f"{str(text_len)} bp"
+        else:
+            text = ''
+
+        # Display the sequence length on the Label.
+        self.seq_len_lbl.config(text=text)
+        
+        # Reset the modified flag to False, for detecting new modification.
+        self.new_dna_seq.edit_modified(False)
 
     def get_EntryContent(self, text_var):
         """Get the content in an Entry as string.
