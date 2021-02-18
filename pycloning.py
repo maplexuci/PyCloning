@@ -8,8 +8,9 @@ def main():
     """The main app function"""
     root = Tk()
     root_window = Root(root)
+    workWindow = WorkingWindow(root_window)
+    workWindow.withdraw()
     return None
-
 
 class Root:
     """Root window class including the widgets and the functions
@@ -139,6 +140,7 @@ class Root:
         self.dna_window = Toplevel()
         self.dna_window.title("New DNA File")
         self.dna_window.geometry("500x400")
+
         # 'grab_set()' and `focus()` ensure the toplevel is active (focused).
         self.dna_window.grab_set()
         self.dna_window.focus()
@@ -156,6 +158,7 @@ class Root:
         # the Text widget change size along with window resizing.
         self.new_dna_seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
         self.new_dna_seq.focus_set()
+
         # Bind the scrooedtext widget with 'self.changed' function
         # to keep track if the content in the widget is 'Modified'.
         self.new_dna_seq.bind('<<Modified>>', self.changed)
@@ -168,12 +171,15 @@ class Root:
         # Add Label and Entry widget in a Frame for entering filename.
         # First, create Frame widget
         filename_Frame = Frame(self.dna_window)
+
         # Create text Label
         Label(filename_Frame, text="File Name: ").pack(side=LEFT)
+
         # Define and use variable type for Entry widget.
         self.name_var = StringVar()
         seq_filename = Entry(filename_Frame, textvariable=self.name_var)
         seq_filename.pack(side=LEFT)
+
         # Pack the Frame in the end after all widgets in Frame are packed.
         filename_Frame.pack(padx=10, anchor=W)
 
@@ -181,10 +187,12 @@ class Root:
         btn_cancel = Button(self.dna_window, text="Cancel", width=10,
                             command=lambda: self.onClosing(self.dna_window))
         btn_cancel.pack(padx=10, pady=10, side=RIGHT)
+
         # Add 'OK' button to read sequence
         self.btn_ok = Button(self.dna_window, text="OK", width=10, state=DISABLED,
-                        command=self.readSeq)
+                             command=self.readSeq)
         self.btn_ok.pack(padx=10, pady=10, side=RIGHT)
+
         #  Respond to 'close window' event
         self.dna_window.protocol("WM_DELETE_WINDOW",
                                  lambda: self.onClosing(self.dna_window))
@@ -195,9 +203,16 @@ class Root:
         """Function to keep track the changes in Text and reflect the changes in the Label"""
         # Only display the length of sequence when it is not empty.
         text = ''
+
+        # '1.0' means the first row (number '1'), the first column (index '0').
         text_len = len(self.new_dna_seq.get(1.0, END).rstrip())
-        self.flag = self.new_dna_seq.edit_modified()
-        if self.flag == 1:
+
+        # Give a 'flag' to track if the ScrolledText widget
+        # is modified using '.edit_modified()' function.
+        # flag has two values, 1 or Trun means modified;
+        # 0 or False means unmodified.
+        flag = self.new_dna_seq.edit_modified()
+        if flag == 1:
             if text_len != 0:
                 text = f"{str(text_len)} bp"
             else:
@@ -236,7 +251,7 @@ class Root:
                 # Update seq to ensure loops through the whole sequence.
                 seq = self.new_dna_seq.get(1.0, END).rstrip()
 
-    def get_EntryContent(self, text_var):
+    def get_EntryContent(self):
         """Get the content in an Entry as string.
 
         Args:
@@ -245,25 +260,35 @@ class Root:
         Returns:
             Str: The content in an Entry widget.
         """
-        self.text_var = text_var
-        return self.text_var.get()
+
+        return self.name_var.get()
 
     def readSeq(self):
-        self.dnaSeq = Seq(self.new_dna_seq.get(1.0, END))  # '1.0' means the first row (number), the first column (index).
+        self.dnaSeq = Seq(self.new_dna_seq.get(1.0, END))
         self.dna_window.destroy()
+        workWindow = WorkingWindow()
+        return self.dnaSeq
+
+
+class WorkingWindow:
+    """Class for the main working window, where you manipulate sequences.
+    """
+    def __init__(self):
+        """Create the working window GUI interface.
+        """
         self.seq_window = Toplevel()
-        self.seq_window.title(self.get_EntryContent(self.name_var))
+        self.title = Root.get_EntryContent(self)
+        self.seq_window.title(self.title)
         self.seq_window.state('zoomed')  # Make the window maximized.
         self.seq_window.protocol("WM_DELETE_WINDOW",
-                                 lambda: self.onClosing(self.seq_window))
-
+                                 lambda: Root.onClosing(self.seq_window))
         # Create a scrolledtext widget.
-        self.dna_seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
-                                                 font=("Courier New", 11))
-        # 'expand=True' and 'fill=BOTH' ensure that
-        # the Text widget change size along with window resizing.
-        self.dna_seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
-        self.dna_seq.insert(1.0, self.dnaSeq)
+        # self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
+        #                                          font=("Courier New", 11))
+        # # 'expand=True' and 'fill=BOTH' ensure that
+        # # the Text widget change size along with window resizing.
+        # self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
+        # self.seq.insert(1.0, Root.readSeq)
 
 
 if __name__ == '__main__':
