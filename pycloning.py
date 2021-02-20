@@ -167,6 +167,7 @@ class NewDNA:
         self.dna_window.grab_set()
         self.dna_window.focus()
 
+        # Call functions to build GUI interface
         self._create_infoLabel()
         self._create_seqInput()
         self._create_seqLen_display()
@@ -284,7 +285,7 @@ class NewDNA:
                 # Update seq to ensure loops through the whole sequence.
                 seq = self.new_dna_seq.get(1.0, END).rstrip()
 
-    def get_EntryContent(self):
+    def get_Filename(self):
         """Get the content in an Entry as string.
 
         Args:
@@ -314,30 +315,179 @@ class WorkingWindow:
         """
         self.parent = parent
         self.seq_window = Toplevel()
-        self.title = parent.get_EntryContent()
+        self.title = parent.get_Filename()
         self.seq_window.title(self.title)
         self.seq_window.state('zoomed')  # Make the window maximized.
 
-        self._seqEditor()
-        self._workWindowMenu()
-
-    def _seqEditor(self):
         # To call onClosing function() in Root, we first call
         # 'call_root_function()' in NewDNA class using 'self.parent', which refers to NewDNA class instance.
         # Then in 'call_root_function()', we call 'onClosing()' in Root, using 'self.parent', which refers to Root class instance.
         self.seq_window.protocol("WM_DELETE_WINDOW",
                                  lambda: self.parent.call_root_function(self.seq_window))
 
+        # Call functions to build GUI interface
+        self._seqEditor()
+        self._workWindowMenu()
+
+    def _seqEditor(self):
         # Create a scrolledtext widget.
         self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
-                                             font=("Orator Std", 12, 'bold'))
+                                             font=("Orator Std", 12, 'bold'))  # Need to change font, this one change every letter into uppercase.
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing.
         self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
-        self.seq.insert(1.0, parent.dnaSeq)
+        self.seq.insert(1.0, self.parent.dnaSeq)
 
     def _workWindowMenu(self):
-        pass
+        # Create the main menubar first
+        self.menubar = Menu(self.seq_window)
+        self.seq_window.config(menu=self.menubar)
+
+        # Create items for 'File' menu.
+        # 'tearoff=False' ensures the menu is not a floatting menu
+        self.file_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="File", menu=self.file_menu)
+        self.file_menu.add_command(label="New DNA File...")
+        self.file_menu.add_command(label="New Protein File...")
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Open Files...")
+        self.file_menu.add_command(label="Open Recent File")
+        self.file_menu.add_command(label="Close", command=quit)
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Import")
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Exit", command=quit)
+
+        # Create items for 'Edit' menu.
+        self.edit_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Edit", menu=self.edit_menu)
+        self.edit_menu.add_command(label="Undo")
+        self.edit_menu.add_command(label="Redo")
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(label="Cut")
+        self.edit_menu.add_command(label="Copy")
+        self.edit_menu.add_command(label="Paste")
+        self.edit_menu.add_command(label="Delete")
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(label="Select All")
+        self.edit_menu.add_command(label="Select Range...")
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(label="Make Uppercase")
+        self.edit_menu.add_command(label="Make Lowercase")
+        self.edit_menu.add_command(label="Set Color...")
+        self.edit_menu.add_separator()
+        self.insert_sub = Menu(self.edit_menu, tearoff=False)
+        self.edit_menu.add_cascade(label="Insert", menu=self.insert_sub)
+        self.insert_sub.add_command(label="Base...")
+        self.insert_sub.add_command(label="Codon...")
+        self.insert_sub.add_command(label="Restriction Site...")
+        self.insert_sub.add_command(label="Feature...")
+        self.edit_menu.add_separator()
+        self.find_sub = Menu(self.edit_menu, tearoff=False)
+        self.edit_menu.add_cascade(label="Find", menu=self.find_sub)
+        self.find_sub.add_command(label="Find DNA Sequence")
+        self.find_sub.add_command(label="Find Protein Sequence")
+        self.find_sub.add_command(label="Find Enzyme / Fearure / Primer")
+        self.edit_menu.add_command(label="Go To...")
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(label="Preference")
+        self.language_sub = Menu(self.edit_menu, tearoff=False)
+        self.edit_menu.add_cascade(label="Language", menu=self.language_sub)
+        self.language_sub.add_command(label="English")
+        self.language_sub.add_command(label="Chinese")
+
+        # Create items for 'View menu
+        self.view_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="View", menu=self.view_menu)
+
+        # Create items for 'Enzymes' menu
+        self.enzyme_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Enzymes", menu=self.enzyme_menu)
+        self.enzyme_menu.add_command(label="Choose Enzymes...")
+        self.enzyme_menu.add_command(label="Show All Enzyme Sites")
+        self.enzyme_menu.add_command(label="Show Unique Enzyme Sites")
+        self.enzyme_menu.add_command(label="Hide All Enzymes")
+        self.enzyme_menu.add_command(label="Noncutters...")
+        self.enzyme_menu.add_separator()
+        self.enzyme_menu.add_command(label="Restriction Enzymes...")
+        self.enzyme_menu.add_command(label="Enzyme Database...")
+
+        # Create items for 'Features' menu
+        self.feature_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Features", menu=self.feature_menu)
+        self.feature_menu.add_command(label="Add Feature...")
+        self.feature_menu.add_command(label="Edit Feature...")
+        self.feature_menu.add_command(label="Duplicate Feature...")
+        self.feature_menu.add_command(label="Remove Feature")
+        self.feature_menu.add_separator()
+        self.feature_menu.add_command(label="Create Feature Segment...")
+        self.feature_menu.add_command(label="Delete Feature Segment...")
+        self.feature_menu.add_command(label="Merge Feature Segments...")
+        self.feature_menu.add_separator()
+        self.feature_menu.add_command(label="Feature Color...")
+        self.feature_menu.add_command(label="Feature List...")
+        self.feature_showhide_sub = Menu(self.feature_menu, tearoff=False)
+        self.feature_menu.add_cascade(label="Show/Hide Features", menu=self.feature_showhide_sub)
+        self.feature_showhide_sub.add_command(label="Show All Features")
+        self.feature_showhide_sub.add_command(label="Show Selected Features")
+        self.feature_showhide_sub.add_command(label="Hide All Features")
+        self.feature_showhide_sub.add_command(label="Hide Selected Features")
+        self.feature_menu.add_separator()
+        self.importFeature_sub = Menu(self.feature_menu, tearoff=False)
+        self.feature_menu.add_cascade(label="Import Features", menu=self.importFeature_sub)
+        self.importFeature_sub.add_command(label="Import Features from a SnapGene File...")
+        self.importFeature_sub.add_command(label="Import Features from a BED File...")
+        self.importFeature_sub.add_command(label="Import Features from a GFF3 File...")
+        self.importFeature_sub.add_command(label="Import Features from a GTF File...")
+        self.feature_menu.add_command(label="Export Feature Data...")
+
+        # Create items in 'Primer' menu
+        self.primer_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Primers", menu=self.primer_menu)
+        self.primer_menu.add_command(label="Add Primer...")
+        self.primer_menu.add_command(label="Edit Primer...")
+        self.primer_menu.add_command(label="Duplicate Primer...")
+        self.primer_menu.add_command(label="Remove Primer")
+        self.primer_menu.add_separator()
+        self.primer_menu.add_command(label="Primer Color...")
+        self.primer_menu.add_command(label="Hybridization Parameters...")
+        self.primer_menu.add_separator()
+        self.primer_showhide_sub = Menu(self.primer_menu, tearoff=False)
+        self.primer_menu.add_cascade(label="Show/Hide Primers", menu=self.primer_showhide_sub)
+        self.primer_showhide_sub.add_command(label="Show All Primers")
+        self.primer_showhide_sub.add_command(label="Show Selected primers")
+        self.primer_showhide_sub.add_command(label="Hide All Primers")
+        self.primer_showhide_sub.add_command(label="Hide Selected Primers")
+        self.primer_menu.add_command(label="Primer List...")
+
+        # Create items for 'Cloning' menu
+        self.cloning_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Cloning", menu=self.cloning_menu)
+        self.cloning_menu.add_command(label="PCR...")
+        self.cloning_menu.add_command(label="Overlapping PCR")
+        self.cloning_menu.add_command(label="Mutagenesis...")
+        self.cloning_menu.add_separator()
+        self.cloning_menu.add_command(label="Restriction Enzyme Cloning")
+        self.cloning_menu.add_command(label="Linear Ligation")
+        self.cloning_menu.add_separator()
+        self.cloning_menu.add_command(label="TA or GC Cloning")
+        self.cloning_menu.add_command(label="TOPO® Cloning")
+        self.cloning_menu.add_command(label="Gateway® Cloning")
+        self.cloning_menu.add_command(label="Gibson Assembly®")
+        self.cloning_menu.add_command(label="In-Fusion® Cloning")
+        self.cloning_menu.add_command(label="NEBuilder® HiFi DNA Assembly")
+
+        # Create items for 'Tools' menu
+        self.tool_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Tools", menu=self.tool_menu)
+
+        # Create items for 'Window' menu
+        self.window_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Windows", menu=self.window_menu)
+
+        # Create items for 'Help' menu
+        self.help_menu = Menu(self.menubar, tearoff=False)
+        self.menubar.add_cascade(label="Help", menu=self.help_menu)
 
 
 if __name__ == '__main__':
