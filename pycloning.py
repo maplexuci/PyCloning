@@ -4,13 +4,13 @@ from tkinter import scrolledtext
 from PIL import ImageTk, Image
 
 
-def main():
-    """The main app function"""
-    root = Tk()
-    root_window = Root(root)
-    workWindow = WorkingWindow(root_window)
-    workWindow.withdraw()
-    return None
+class main:
+    """The main app class"""
+    def __init__(self):
+        root = Tk()
+        root_window = Root(root)
+        return None
+
 
 class Root:
     """Root window class including the widgets and the functions
@@ -35,7 +35,7 @@ class Root:
         self.file_menu = Menu(self.menubar, tearoff=False)
         # Adding cascade to 'File' menu.
         self.menubar.add_cascade(label="File", menu=self.file_menu)
-        self.file_menu.add_command(label="New DNA File...", command=self.new_DNA)
+        self.file_menu.add_command(label="New DNA File...", command=lambda: NewDNA(self))  # 'self' here represents the 'parent' in class NewDNA constructor.
         self.file_menu.add_command(label="New Protein File...")
         self.file_menu.add_separator()
         self.file_menu.add_command(label="Open Files...")
@@ -130,13 +130,21 @@ class Root:
         window.destroy()
         self.show()
 
-    def new_DNA(self):
+
+
+class NewDNA:
+    def __init__(self, parent):
         """Create new toplevel window for new DNA file
+        Variable:
+            parent: the widget class, from which this NewDNA class is called.
 
         Returns:
-            [type]: [description]
+            [type]: [None]
         """
-        self.hide()
+        # 'parent' refers to the Root class instance.
+        # 'self.parent=parent' associates the Root instance with NewDNA instance.
+        self.parent = parent
+        self.parent.hide()  # This will call the hide() method in Root class.
         self.dna_window = Toplevel()
         self.dna_window.title("New DNA File")
         self.dna_window.geometry("500x400")
@@ -151,7 +159,7 @@ class Root:
         # Create a scrolledtext widget.
         self.new_dna_seq = scrolledtext.ScrolledText(
                                 self.dna_window, wrap=WORD,
-                                width=80, height=15, font=("Courier New", 11),
+                                width=80, height=15, font=("Courier", 11),
                                 )
 
         # 'expand=True' and 'fill=BOTH' ensure that
@@ -185,7 +193,7 @@ class Root:
 
         # Respond to the 'Cancel' button.
         btn_cancel = Button(self.dna_window, text="Cancel", width=10,
-                            command=lambda: self.onClosing(self.dna_window))
+                            command=lambda: self.parent.onClosing(self.dna_window))
         btn_cancel.pack(padx=10, pady=10, side=RIGHT)
 
         # Add 'OK' button to read sequence
@@ -195,7 +203,7 @@ class Root:
 
         #  Respond to 'close window' event
         self.dna_window.protocol("WM_DELETE_WINDOW",
-                                 lambda: self.onClosing(self.dna_window))
+                                 lambda: self.parent.onClosing(self.dna_window))
 
         return None
 
@@ -266,29 +274,38 @@ class Root:
     def readSeq(self):
         self.dnaSeq = Seq(self.new_dna_seq.get(1.0, END))
         self.dna_window.destroy()
-        workWindow = WorkingWindow()
-        return self.dnaSeq
+        workWindow = WorkingWindow(self)
+
+    def call_root_function(self, window):
+        """Call onClosing() function in with a Root instance"""
+        self.parent.onClosing(window)
 
 
 class WorkingWindow:
     """Class for the main working window, where you manipulate sequences.
     """
-    def __init__(self):
+    def __init__(self, parent):
         """Create the working window GUI interface.
         """
+        self.parent = parent
         self.seq_window = Toplevel()
-        self.title = Root.get_EntryContent(self)
+        self.title = parent.get_EntryContent()
         self.seq_window.title(self.title)
         self.seq_window.state('zoomed')  # Make the window maximized.
+
+        # To call onClosing function() in Root, we first call
+        # 'call_root_function()' in NewDNA class using 'self.parent', which refers to NewDNA class instance.
+        # Then in 'call_root_function()', we call 'onClosing()' in Root, using 'self.parent', which refers to Root class instance.
         self.seq_window.protocol("WM_DELETE_WINDOW",
-                                 lambda: Root.onClosing(self.seq_window))
+                                 lambda: self.parent.call_root_function(self.seq_window))
+
         # Create a scrolledtext widget.
-        # self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
-        #                                          font=("Courier New", 11))
-        # # 'expand=True' and 'fill=BOTH' ensure that
-        # # the Text widget change size along with window resizing.
-        # self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
-        # self.seq.insert(1.0, Root.readSeq)
+        self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
+                                             font=("Orator Std", 12, 'bold'))
+        # 'expand=True' and 'fill=BOTH' ensure that
+        # the Text widget change size along with window resizing.
+        self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
+        self.seq.insert(1.0, parent.dnaSeq)
 
 
 if __name__ == '__main__':
