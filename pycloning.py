@@ -87,12 +87,16 @@ class Root:
         self.status = Label(self.root, bd=1, relief=SUNKEN, height=3)
         self.status.grid(row=6, column=0, columnspan=3, sticky=W+E)
 
-        self.pixelVirtual = PhotoImage(width=1, height=1)
-        self.btn_ndf = Button(self.root, image=self.pixelVirtual, width=35, height=35)
-        self.btn_npf = Button(self.root, image=self.pixelVirtual, width=35, height=35)
-        self.btn_open = Button(self.root, image=self.pixelVirtual, width=35, height=35)
-        self.btn_orf = Button(self.root, image=self.pixelVirtual, width=35, height=35)
-        self.btn_import = Button(self.root, image=self.pixelVirtual, width=35, height=35)
+        self.ndf_img = PhotoImage(file="imgs/dna_icon_30.png")
+        self.npf_img = PhotoImage(file="imgs/protein_icon_30.png")
+        self.open_img = PhotoImage(file="imgs/folder_empty_icon_30.png")
+        self.orf_img = PhotoImage(file="imgs/folder_file_icon_30.png")
+        self.import_img = PhotoImage(file="imgs/import_icon_30.png")
+        self.btn_ndf = Button(self.root, image=self.ndf_img, width=35, height=35)
+        self.btn_npf = Button(self.root, image=self.npf_img, width=35, height=35)
+        self.btn_open = Button(self.root, image=self.open_img, width=35, height=35)
+        self.btn_orf = Button(self.root, image=self.orf_img, width=35, height=35)
+        self.btn_import = Button(self.root, image=self.import_img, width=35, height=35)
 
         self.lbl_ndf = Label(self.root, text="New DNA File...", bg="#ebf5fc")
         self.lbl_npf = Label(self.root, text="New Protein File...", bg="#ebf5fc")
@@ -306,6 +310,9 @@ class WorkingWindow:
         # the Text widget change size along with window resizing.
         self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
         self.seq.insert(1.0, parent.dnaSeq)
+
+    def workWindowMenu(self):
+        pass
 
 
 if __name__ == '__main__':
