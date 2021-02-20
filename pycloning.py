@@ -17,7 +17,7 @@ class Root:
     for responding the widgets.
     """
     def __init__(self, root):
-        # Main root window configration
+        # Root window configration
         self.root = root
         self.root.title("PyCloning")
         self.root.geometry("700x400")
@@ -26,6 +26,16 @@ class Root:
         self.root.columnconfigure(0, weight=2)
         self.root.columnconfigure((1, 2), weight=1)
 
+        # Call functions to GUI interface
+        self._create_menu()
+        self._create_display()
+        self._create_button_and_label()
+        self._create_statusBar()
+
+        # Start mainloop
+        self.root.mainloop()
+
+    def _create_menu(self):
         # Create menubar first
         self.menubar = Menu(self.root)
         self.root.config(menu=self.menubar)
@@ -35,7 +45,7 @@ class Root:
         self.file_menu = Menu(self.menubar, tearoff=False)
         # Adding cascade to 'File' menu.
         self.menubar.add_cascade(label="File", menu=self.file_menu)
-        self.file_menu.add_command(label="New DNA File...", command=lambda: NewDNA(self))  # 'self' here represents the 'parent' in class NewDNA constructor.
+        self.file_menu.add_command(label="New DNA File...", command=lambda: NewDNA(self))  # 'self' is passed to the 'parent' argument in class NewDNA constructor.
         self.file_menu.add_command(label="New Protein File...")
         self.file_menu.add_separator()
         self.file_menu.add_command(label="Open Files...")
@@ -75,6 +85,7 @@ class Root:
         self.ref_menu.add_command(label="Genetic Code Tables")
         self.ref_menu.add_command(label="Codon Usage Tables")
 
+    def _create_display(self):
         self.VERSION = "V0.1"
         self.ver_title = Label(self.root, text="PyCloning " + self.VERSION, font=("Courier", 24, "bold"), bg="#ebf5fc")
         self.ver_title.grid(row=0, column=0, columnspan=3, padx=220, pady=10, sticky=E+W)
@@ -84,9 +95,7 @@ class Root:
         self.logo = ImageTk.PhotoImage(Image.open("imgs/logo.png"))
         self.canvas.create_image(130, 130, image=self.logo)
 
-        self.status = Label(self.root, bd=1, relief=SUNKEN, height=3)
-        self.status.grid(row=6, column=0, columnspan=3, sticky=W+E)
-
+    def _create_button_and_label(self):
         self.ndf_img = PhotoImage(file="imgs/dna_icon_30.png")
         self.npf_img = PhotoImage(file="imgs/protein_icon_30.png")
         self.open_img = PhotoImage(file="imgs/folder_empty_icon_30.png")
@@ -116,7 +125,9 @@ class Root:
         self.lbl_orf.grid(row=4, column=2, pady=10, sticky=W)
         self.lbl_import.grid(row=5, column=2, pady=10, sticky=W)
 
-        self.root.mainloop()
+    def _create_statusBar(self):
+        self.status = Label(self.root, bd=1, relief=SUNKEN, height=3)
+        self.status.grid(row=6, column=0, columnspan=3, sticky=W+E)
 
     def hide(self):
         """Hide the root window."""
@@ -133,7 +144,6 @@ class Root:
         """
         window.destroy()
         self.show()
-
 
 
 class NewDNA:
@@ -157,9 +167,17 @@ class NewDNA:
         self.dna_window.grab_set()
         self.dna_window.focus()
 
+        self._create_infoLabel()
+        self._create_seqInput()
+        self._create_seqLen_display()
+        self._create_fileName()
+        self._create_buttons()
+
+    def _create_infoLabel(self):
         lbl = Label(self.dna_window, text="Input your sequence:")
         lbl.pack(padx=10, pady=(10, 0), anchor=W)
 
+    def _create_seqInput(self):
         # Create a scrolledtext widget.
         self.new_dna_seq = scrolledtext.ScrolledText(
                                 self.dna_window, wrap=WORD,
@@ -176,10 +194,12 @@ class NewDNA:
         self.new_dna_seq.bind('<<Modified>>', self.changed)
         self.new_dna_seq.bind('<KeyRelease>', self.onValidate)
 
+    def _create_seqLen_display(self):
         # Add another Label widget to display the sequence length.
         self.seq_len_lbl = Label(self.dna_window)
         self.seq_len_lbl.pack(padx=10, anchor=W)
 
+    def _create_fileName(self):
         # Add Label and Entry widget in a Frame for entering filename.
         # First, create Frame widget
         filename_Frame = Frame(self.dna_window)
@@ -195,6 +215,7 @@ class NewDNA:
         # Pack the Frame in the end after all widgets in Frame are packed.
         filename_Frame.pack(padx=10, anchor=W)
 
+    def _create_buttons(self):
         # Respond to the 'Cancel' button.
         btn_cancel = Button(self.dna_window, text="Cancel", width=10,
                             command=lambda: self.parent.onClosing(self.dna_window))
@@ -297,6 +318,10 @@ class WorkingWindow:
         self.seq_window.title(self.title)
         self.seq_window.state('zoomed')  # Make the window maximized.
 
+        self._seqEditor()
+        self._workWindowMenu()
+
+    def _seqEditor(self):
         # To call onClosing function() in Root, we first call
         # 'call_root_function()' in NewDNA class using 'self.parent', which refers to NewDNA class instance.
         # Then in 'call_root_function()', we call 'onClosing()' in Root, using 'self.parent', which refers to Root class instance.
@@ -311,7 +336,7 @@ class WorkingWindow:
         self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
         self.seq.insert(1.0, parent.dnaSeq)
 
-    def workWindowMenu(self):
+    def _workWindowMenu(self):
         pass
 
 
