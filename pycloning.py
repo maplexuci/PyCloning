@@ -2,6 +2,7 @@ from Bio.Seq import Seq
 from tkinter import *
 from tkinter import scrolledtext
 from PIL import ImageTk, Image
+# from tkinter.font import Font
 
 
 class main:
@@ -331,12 +332,14 @@ class WorkingWindow:
 
     def _seqEditor(self):
         # Create a scrolledtext widget.
+        self.dnaSeq = self.parent.dnaSeq
+        print(type(self.dnaSeq))
         self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
-                                             font=("Orator Std", 12, 'bold'))  # Need to change font, this one change every letter into uppercase.
+                                             font=("Consolas", 12))  # Need to change font, this one change every letter into uppercase.
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing.
         self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
-        self.seq.insert(1.0, self.parent.dnaSeq)
+        self.seq.insert(1.0, self.dnaSeq)
 
     def _workWindowMenu(self):
         # Create the main menubar first
