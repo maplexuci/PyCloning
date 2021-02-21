@@ -330,17 +330,6 @@ class WorkingWindow:
         self._seqEditor()
         self._workWindowMenu()
 
-    def _seqEditor(self):
-        # Create a scrolledtext widget.
-        self.dnaSeq = self.parent.dnaSeq
-        print(type(self.dnaSeq))
-        self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
-                                             font=("Consolas", 12))  # Need to change font, this one change every letter into uppercase.
-        # 'expand=True' and 'fill=BOTH' ensure that
-        # the Text widget change size along with window resizing.
-        self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
-        self.seq.insert(1.0, self.dnaSeq)
-
     def _workWindowMenu(self):
         # Create the main menubar first
         self.menubar = Menu(self.seq_window)
@@ -491,6 +480,25 @@ class WorkingWindow:
         # Create items for 'Help' menu
         self.help_menu = Menu(self.menubar, tearoff=False)
         self.menubar.add_cascade(label="Help", menu=self.help_menu)
+
+    def _seqEditor(self):
+        # Create a scrolledtext widget.
+        self.dnaSeq = self.parent.dnaSeq
+        self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
+                                             font=("Consolas", 12))  # Need to change font, this one change every letter into uppercase.
+        # 'expand=True' and 'fill=BOTH' ensure that
+        # the Text widget change size along with window resizing.
+        self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
+        self.seq.insert(1.0, self.dnaSeq)  ## Need to break sequence into multi-line with fix characters per line.
+
+        self.seq.window_create(2.5, window=Button(self.seq, text="Feature"))  ## This is a way to add Sequence features. Need to seperate sequences
+                                                                              ## into multi-lines for adding more widgets at desired index.
+
+    def _reverseComplement(self):
+        # Return the reverse complement sequence of the Seq object.
+        return self.dnaSeq.reverse_complement()
+
+    
 
 
 if __name__ == '__main__':
