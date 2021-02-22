@@ -485,11 +485,11 @@ class WorkingWindow:
         # Create a scrolledtext widget.
         self.dnaSeq = self.parent.dnaSeq
 
-        self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
+        self.seqEditor = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
                                              font=("Consolas", 12), bg="#f5feff")
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing."
-        self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
+        self.seqEditor.pack(padx=10, expand=True, fill=BOTH, anchor=W)
 
         row_num = len(self.dnaSeq)//150 + 1
         remain_seq_len = 0
@@ -510,16 +510,16 @@ class WorkingWindow:
             space = 150-len(row_seq)+8
             row_seq_com = self._complement(row_seq)
             row_display = f"{row_seq}{whitespace*space}{current_seq_len}\n{row_seq_com}\n"
-            self.seq.insert(END, row_display)
-            self.seq.insert(END, '\n')
+            self.seqEditor.insert(END, row_display)
+            self.seqEditor.insert(END, '\n')
 
             # self.seq.window_create(2.5, window=Button(self.seq, text="Feature"))  ## This is a way to add Sequence features. Need to seperate sequences
                                                                               ## into multi-lines for adding more widgets at desired index.
 
-    def _complement(self, dna):
+    def _complement(self, seq):
         # Return the complement sequence of the Seq object.
-        self.dna = dna
-        return self.dna.complement()
+        self.seq = seq
+        return self.seq.complement()
     
     def _reverseComplement(self, seq):
         # Return the reverse complement sequence of the Seq object.
