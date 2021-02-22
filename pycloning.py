@@ -299,7 +299,7 @@ class NewDNA:
         return self.name_var.get()
 
     def readSeq(self):
-        self.dnaSeq = Seq(self.new_dna_seq.get(1.0, END))
+        self.dnaSeq = Seq(self.new_dna_seq.get(1.0, "end-1c"))
         self.dna_window.destroy()
         workWindow = WorkingWindow(self)
 
@@ -490,12 +490,29 @@ class WorkingWindow:
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing."
         self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
-        for row in range(len(self.dnaSeq)//150 + 1):
-            row_seq = str(self.dnaSeq[row*150+1 : (row+1)*150+1]) + '\n'
-            self.seq.insert(END, row_seq)
+
+        row_num = len(self.dnaSeq)//150 + 1
+        remain_seq_len = 0
+        current_seq_len = 0
+        for row in range(row_num):
+            if row == 0:
+                row_seq = self.dnaSeq[0 : (row+1)*150]
+                current_seq_len = (row+1)*150 + remain_seq_len
+            elif 0 < row <= row_num-2:
+                row_seq = self.dnaSeq[row*150+1:(row+1)*150+1]
+                current_seq_len = (row+1)*150 + remain_seq_len
+            else:
+                remain_seq_len = len(self.dnaSeq) % 150
+                row_seq = self.dnaSeq[row*150+1:-1]
+                current_seq_len = current_seq_len + remain_seq_len
+            
+            whitespace = ' '
+            space = 150-len(row_seq)+8
+            row_display = f"{row_seq}{whitespace*space}{current_seq_len}\n"
+            self.seq.insert(END, row_display)
             self.seq.insert(END, '\n')  ## Need to break sequence into multi-line with fix characters per line.
 
-        # self.seq.window_create(2.5, window=Button(self.seq, text="Feature"))  ## This is a way to add Sequence features. Need to seperate sequences
+            # self.seq.window_create(2.5, window=Button(self.seq, text="Feature"))  ## This is a way to add Sequence features. Need to seperate sequences
                                                                               ## into multi-lines for adding more widgets at desired index.
 
     def _reverseComplement(self):
