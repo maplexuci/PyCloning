@@ -508,16 +508,23 @@ class WorkingWindow:
             
             whitespace = ' '
             space = 150-len(row_seq)+8
-            row_display = f"{row_seq}{whitespace*space}{current_seq_len}\n"
+            row_seq_com = self._complement(row_seq)
+            row_display = f"{row_seq}{whitespace*space}{current_seq_len}\n{row_seq_com}\n"
             self.seq.insert(END, row_display)
-            self.seq.insert(END, '\n')  ## Need to break sequence into multi-line with fix characters per line.
+            self.seq.insert(END, '\n')
 
             # self.seq.window_create(2.5, window=Button(self.seq, text="Feature"))  ## This is a way to add Sequence features. Need to seperate sequences
                                                                               ## into multi-lines for adding more widgets at desired index.
 
-    def _reverseComplement(self):
+    def _complement(self, dna):
+        # Return the complement sequence of the Seq object.
+        self.dna = dna
+        return self.dna.complement()
+    
+    def _reverseComplement(self, seq):
         # Return the reverse complement sequence of the Seq object.
-        return self.dnaSeq.reverse_complement()
+        self.seq = seq
+        return self.seq.reverse_complement()
 
     
 
