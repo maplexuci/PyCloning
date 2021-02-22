@@ -484,14 +484,18 @@ class WorkingWindow:
     def _seqEditor(self):
         # Create a scrolledtext widget.
         self.dnaSeq = self.parent.dnaSeq
-        self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
-                                             font=("Consolas", 12))  # Need to change font, this one change every letter into uppercase.
-        # 'expand=True' and 'fill=BOTH' ensure that
-        # the Text widget change size along with window resizing.
-        self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
-        self.seq.insert(1.0, self.dnaSeq)  ## Need to break sequence into multi-line with fix characters per line.
 
-        self.seq.window_create(2.5, window=Button(self.seq, text="Feature"))  ## This is a way to add Sequence features. Need to seperate sequences
+        self.seq = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
+                                             font=("Consolas", 12), bg="#f5feff")
+        # 'expand=True' and 'fill=BOTH' ensure that
+        # the Text widget change size along with window resizing."
+        self.seq.pack(padx=10, expand=True, fill=BOTH, anchor=W)
+        for row in range(len(self.dnaSeq)//150 + 1):
+            row_seq = str(self.dnaSeq[row*150+1 : (row+1)*150+1]) + '\n'
+            self.seq.insert(END, row_seq)
+            self.seq.insert(END, '\n')  ## Need to break sequence into multi-line with fix characters per line.
+
+        # self.seq.window_create(2.5, window=Button(self.seq, text="Feature"))  ## This is a way to add Sequence features. Need to seperate sequences
                                                                               ## into multi-lines for adding more widgets at desired index.
 
     def _reverseComplement(self):
