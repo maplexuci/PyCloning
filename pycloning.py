@@ -485,36 +485,58 @@ class WorkingWindow:
         # Create a scrolledtext widget.
         self.dnaSeq = self.parent.dnaSeq
 
-        self.seqEditor = scrolledtext.ScrolledText(self.seq_window, wrap=WORD,
+        self.seqFrame = Frame(self.seq_window)
+        self.seqFrame.pack(fill=BOTH, expand=True)
+        self.seqFrame.update()
+
+        self.seqEditor = scrolledtext.ScrolledText(self.seqFrame, wrap=WORD,
                                              font=("Consolas", 12), bg="#f5feff")
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing."
-        self.seqEditor.pack(padx=10, expand=True, fill=BOTH, anchor=W)
+        self.seqEditor.pack(expand=True, fill=BOTH, anchor=W)
 
-        row_num = len(self.dnaSeq)//150 + 1
-        remain_seq_len = 0
-        current_seq_len = 0
+        texteditor_width = self.seqFrame.winfo_width()
+
+        # Size 12 of 'Consolas' font takes 9 pixels per character
+        # The default width of the vertical scrollbar is 16 pixels.
+        
+        self.L_SPACE_FIX = 80
+        self.R_SPACE_FIX = 160
+        char_per_line = (texteditor_width - 16 - self.L_SPACE_FIX - self.R_SPACE_FIX) // 9  ## For a full screen with 1920 pixels in width, the remainder is 8 pixels.
+        row_num = len(self.dnaSeq)//char_per_line + 1
+        # current_seq_len = 0
+
         for row in range(row_num):
             if row == 0:
-                row_seq = self.dnaSeq[0 : (row+1)*150]
-                current_seq_len = (row+1)*150 + remain_seq_len
+                row_seq_plus = self.dnaSeq[0 : (row+1)*char_per_line]
             elif 0 < row <= row_num-2:
-                row_seq = self.dnaSeq[row*150+1:(row+1)*150+1]
-                current_seq_len = (row+1)*150 + remain_seq_len
+                row_seq_plus = self.dnaSeq[row*char_per_line+1:(row+1)*char_per_line+1]
             else:
-                remain_seq_len = len(self.dnaSeq) % 150
-                row_seq = self.dnaSeq[row*150+1:-1]
-                current_seq_len = current_seq_len + remain_seq_len
-            
-            whitespace = ' '
-            space = 150-len(row_seq)+8
-            row_seq_com = self._complement(row_seq)
-            row_display = f"{row_seq}{whitespace*space}{current_seq_len}\n{row_seq_com}\n"
-            self.seqEditor.insert(END, row_display)
-            self.seqEditor.insert(END, '\n')
+                row_seq_plus = self.dnaSeq[row*char_per_line+1:-1]
 
-            # self.seq.window_create(2.5, window=Button(self.seq, text="Feature"))  ## This is a way to add Sequence features. Need to seperate sequences
-                                                                              ## into multi-lines for adding more widgets at desired index.
+            remain_seq_len = char_per_line - len(row_seq_plus)
+            
+            # Determine the index for plus strans and minus strand
+            plus_seq_index = str(row*2+1)+'.0'
+            minus_seq_index = str(row*2+2)+'.0'
+
+            # By showing the complement sequence from left to right makes it look like the reverse complement sequence
+            row_seq_minus = self._complement(row_seq_plus)
+
+            # Insert the sequence for both plus and minus strant, with spaces(taken by Frames) on both end of a line,
+            # and a empty space(taken by Frames) between each line.
+            self.seqEditor.window_create(plus_seq_index, window=Frame(self.seqEditor, width=self.L_SPACE_FIX, bg="red"), stretch=1)
+            self.seqEditor.insert('end-1c', row_seq_plus)
+                ## With the fullscreen (1920 pixels in width), for "Consolas size 12" font, the ScrolledText holds 211 characters and remains 5 pixels per line.
+                ## By adding Frames on both end (left frame with 80 pixels and right frame with 160 pixels in width), each line holds 184 characters and remans 8 pixels.
+                ## There is a 3 pixels difference, therefore, 3 pixels need to be added to the right frame width plus the pixels that the blanks take for a not full line.
+                ## Note: if function for choosing font size is added in the future, the pixel difference need to be recalculated.
+            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="red"), stretch=1)  
+            self.seqEditor.window_create(minus_seq_index, window=Frame(self.seqEditor, width=self.L_SPACE_FIX, bg="red"), stretch=1)
+            self.seqEditor.insert('end-1c', row_seq_minus)
+            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="red"), stretch=1) 
+            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=texteditor_width, bg="green"), stretch=1)
+            self.seqEditor.insert(END, '\n')
 
     def _complement(self, seq):
         # Return the complement sequence of the Seq object.
@@ -527,7 +549,5 @@ class WorkingWindow:
         return self.seq.reverse_complement()
 
     
-
-
 if __name__ == '__main__':
     main()
