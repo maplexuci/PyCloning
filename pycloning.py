@@ -525,17 +525,17 @@ class WorkingWindow:
 
             # Insert the sequence for both plus and minus strant, with spaces(taken by Frames) on both end of a line,
             # and a empty space(taken by Frames) between each line.
-            self.seqEditor.window_create(plus_seq_index, window=Frame(self.seqEditor, width=self.L_SPACE_FIX, bg="red"), stretch=1)
+            self.seqEditor.window_create(plus_seq_index, window=Frame(self.seqEditor, width=self.L_SPACE_FIX, bg="#f5feff"), stretch=1)
             self.seqEditor.insert('end-1c', row_seq_plus)
                 ## With the fullscreen (1920 pixels in width), for "Consolas size 12" font, the ScrolledText holds 211 characters and remains 5 pixels per line.
                 ## By adding Frames on both end (left frame with 80 pixels and right frame with 160 pixels in width), each line holds 184 characters and remans 8 pixels.
                 ## There is a 3 pixels difference, therefore, 3 pixels need to be added to the right frame width plus the pixels that the blanks take for a not full line.
                 ## Note: if function for choosing font size is added in the future, the pixel difference need to be recalculated.
-            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="red"), stretch=1)  
-            self.seqEditor.window_create(minus_seq_index, window=Frame(self.seqEditor, width=self.L_SPACE_FIX, bg="red"), stretch=1)
+            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff"), stretch=1)  
+            self.seqEditor.window_create(minus_seq_index, window=Frame(self.seqEditor, width=self.L_SPACE_FIX, bg="#f5feff"), stretch=1)
             self.seqEditor.insert('end-1c', row_seq_minus)
-            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="red"), stretch=1) 
-            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=texteditor_width, bg="green"), stretch=1)
+            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff"), stretch=1) 
+            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=texteditor_width, bg="#f5feff"), stretch=1)
             self.seqEditor.insert(END, '\n')
 
     def _complement(self, seq):
