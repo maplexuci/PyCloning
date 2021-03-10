@@ -525,7 +525,7 @@ class WorkingWindow:
 
             # One widget object can only be place at one location, therefore, if put a widget object in a variable,
             # it can only be refered (placed) once.
-            self.frame_in_text_R = Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="blue")
+            self.frame_in_text_R = Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff")
             
             # Determine the index for plus strans and minus strand
             plus_seq_index = str(row*2+1)+'.0'
@@ -547,13 +547,13 @@ class WorkingWindow:
             self.seqEditor.insert('end-1c', row_seq_minus)
 
             # Here the 'Frame' object 'self.frame_in_text_R' can not be used again, as this will be removed from its first location.
-            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="blue"), stretch=1) 
+            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff"), stretch=1) 
             self.seqEditor.window_create('end', create=self._createLineFrame, stretch=1)
             self.seqEditor.insert("end", '\n')
 
     def _createLeftFrame(self, func=None):
         # The call back function to create the left Frame widget in the Text
-        self.frame_in_text_L = Frame(self.seqEditor, width=self.L_SPACE_FIX, bg="red")
+        self.frame_in_text_L = Frame(self.seqEditor, width=self.L_SPACE_FIX, bg="#f5feff")
 
         # if func is not None:
         #     func(self.frame_in_text_L)            
@@ -561,7 +561,7 @@ class WorkingWindow:
 
     def _createLineFrame(self):
         # The call back function to create the between-line Frame widget in the Text
-        self.frame_in_text_Line = Frame(self.seqEditor, width=self.texteditor_width, bg="yellow")
+        self.frame_in_text_Line = Frame(self.seqEditor, width=self.texteditor_width, bg="#f5feff")
         return self.frame_in_text_Line
 
     def _createLeftLabel(self, frame):
