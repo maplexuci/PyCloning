@@ -2,14 +2,13 @@ from Bio.Seq import Seq
 from tkinter import *
 from tkinter import scrolledtext
 from PIL import ImageTk, Image
-# from tkinter.font import Font
 
 
 class main:
     """The main app class"""
     def __init__(self):
         root = Tk()
-        root_window = Root(root)
+        Root(root)
         return None
 
 
@@ -102,13 +101,14 @@ class Root:
         self.open_img = PhotoImage(file="imgs/folder_empty_icon_30.png")
         self.orf_img = PhotoImage(file="imgs/folder_file_icon_30.png")
         self.import_img = PhotoImage(file="imgs/import_icon_30.png")
-        self.btn_ndf = Button(self.root, image=self.ndf_img, width=35, height=35)
+        self.btn_ndf = Button(self.root, image=self.ndf_img, width=35, height=35, command=lambda: NewDNA(self))
         self.btn_npf = Button(self.root, image=self.npf_img, width=35, height=35)
         self.btn_open = Button(self.root, image=self.open_img, width=35, height=35)
         self.btn_orf = Button(self.root, image=self.orf_img, width=35, height=35)
         self.btn_import = Button(self.root, image=self.import_img, width=35, height=35)
 
         self.lbl_ndf = Label(self.root, text="New DNA File...", bg="#ebf5fc")
+        self.lbl_ndf.bind("<Button-1>", lambda event, : NewDNA(self))  # binding with lambda, needs an 'event' parameter.
         self.lbl_npf = Label(self.root, text="New Protein File...", bg="#ebf5fc")
         self.lbl_open = Label(self.root, text="Open", bg="#ebf5fc")
         self.lbl_orf = Label(self.root, text="Open Recent File", bg="#ebf5fc")
@@ -301,7 +301,7 @@ class NewDNA:
     def readSeq(self):
         self.dnaSeq = Seq(self.new_dna_seq.get(1.0, "end-1c"))
         self.dna_window.destroy()
-        workWindow = WorkingWindow(self)
+        WorkingWindow(self)
 
     def call_root_function(self, window):
         """Call onClosing() function in with a Root instance"""
@@ -321,8 +321,10 @@ class WorkingWindow:
         self.seq_window.state('zoomed')  # Make the window maximized.
 
         # To call onClosing function() in Root, we first call
-        # 'call_root_function()' in NewDNA class using 'self.parent', which refers to NewDNA class instance.
-        # Then in 'call_root_function()', we call 'onClosing()' in Root, using 'self.parent', which refers to Root class instance.
+        # 'call_root_function()' in NewDNA class using 'self.parent',
+        # which refers to NewDNA class instance.
+        # Then in 'call_root_function()', we call 'onClosing()' in Root
+        # using 'self.parent', which refers to Root class instance.
         self.seq_window.protocol("WM_DELETE_WINDOW",
                                  lambda: self.parent.call_root_function(self.seq_window))
 
@@ -550,6 +552,9 @@ class WorkingWindow:
             self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff"), stretch=1) 
             self.seqEditor.window_create('end', create=self._createLineFrame, stretch=1)
             self.seqEditor.insert("end", '\n')
+        
+        # Fill the last blank line with a Frame widget having the same bg color.
+        self.seqEditor.window_create('end', create=self._createLineFrame, stretch=1)
 
     def _createLeftFrame(self, func=None):
         # The call back function to create the left Frame widget in the Text
