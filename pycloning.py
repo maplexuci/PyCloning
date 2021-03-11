@@ -502,18 +502,25 @@ class WorkingWindow:
 
     def _layout(self):
         """layout the sequences and the widgets in the seqEditor."""
-        self.texteditor_width = self.seqFrame.winfo_width()
         
+        # Get the current width in pixels of the texteditor.
+        self.texteditor_width = self.seqFrame.winfo_width()
+
+        # Setup constant for the margin spaces in Text widget.
         self.L_SPACE_FIX = 80
         self.R_SPACE_FIX = 160
 
-        # Size 12 of 'Consolas' font takes 9 pixels per character
-        # The default width of the vertical scrollbar is 16 pixels
-        ## For a full screen with 1920 pixels in width, the remainder of each line is 8 pixels.
+        # Determine the line numbers and characters per line for the input sequence, based on the current window size.
+            ## Size 12 of 'Consolas' font takes 9 pixels per character
+            ## The default width of the vertical scrollbar is 16 pixels
+            ## For a full screen with 1920 pixels in width, the remainder of each line is 8 pixels.
         char_per_line = (self.texteditor_width - 16 - self.L_SPACE_FIX - self.R_SPACE_FIX) // 9
         row_num = len(self.dnaSeq)//char_per_line
+
+        # Initialize the status for counting the total sequence length.
         self.current_seq_len = 0
 
+        # Start the loop for sequence and widgets display in Text widget.
         for row in range(row_num+1):
             if row == 0:
                 row_seq_plus = self.dnaSeq[0 : (row+1)*char_per_line]
@@ -522,13 +529,12 @@ class WorkingWindow:
             else:
                 row_seq_plus = self.dnaSeq[row*char_per_line+1:]               
 
-            # Deterimne the empty spaces for the last line
+            # Deterimne the empty spaces for the last line.
             remain_seq_len = char_per_line - len(row_seq_plus)
 
-            # One widget object can only be place at one location, therefore, if put a widget object in a variable,
-            # it can only be refered (placed) once.
-            self.frame_in_text_R = Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff")
-            
+            # Determine the total sequence length upto the end of the current line.
+            self.current_seq_len = self.current_seq_len + len(row_seq_plus)
+
             # Determine the index for plus strans and minus strand
             plus_seq_index = str(row*2+1)+'.0'
             minus_seq_index = str(row*2+2)+'.0'
@@ -539,22 +545,43 @@ class WorkingWindow:
             # Insert the sequence for both plus and minus strand, with spaces(taken by Frames) on both end of a line,
             # and a empty space(taken by Frames) between each line.
             self.seqEditor.window_create(plus_seq_index, create=self._createLeftFrame, stretch=1)
+
+            # Display the plus sequence strand.
             self.seqEditor.insert('end-1c', row_seq_plus)
+
+            # Display the right Frame for the plus strand.
                 ## With the fullscreen (1920 pixels in width), for "Consolas size 12" font, the ScrolledText holds 211 characters and remains 5 pixels per line.
                 ## By adding Frames on both end (left frame with 80 pixels and right frame with 160 pixels in width), each line holds 184 characters and remans 8 pixels.
                 ## There is a 3 pixels difference, therefore, 3 pixels need to be added to the right frame width plus the pixels that the blanks take for a not full line.
                 ## Note: if function for choosing font size is added in the future, the pixel difference need to be recalculated.
+            self.frame_in_text_R = Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff")
             self.seqEditor.window_create('end', window=self.frame_in_text_R, stretch=1)  ## The 'Frame' object is refered here.
+            self.frame_in_text_R.pack_propagate(0)  # To make sure the Frame size will not be shrink or expand to fit.
+            self._createRightLabel()  # Call function to create Label on Frame to display the seqence length.
+
+            # Display the left Frame for the minus strand.
             self.seqEditor.window_create(minus_seq_index, create=self._createLeftFrame, stretch=1)
+
+            # Display the minus sequence strand.
             self.seqEditor.insert('end-1c', row_seq_minus)
 
-            # Here the 'Frame' object 'self.frame_in_text_R' can not be used again, as this will be removed from its first location.
-            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff"), stretch=1) 
-            self.seqEditor.window_create('end', create=self._createLineFrame, stretch=1)
+            # Display the right Frame for the minus strand.
+                ## Here the 'Frame' object 'self.frame_in_text_R' can not be used again,
+                ## because it was used for the plus strand, otherwise, it will be removed from its first location
+                ## if you used it again and then cause incorrect display.
+            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff"), stretch=1)
+
+            # Display the between-line Frames.
+            # self.r_frames = []
+            # self.r_frames.append(self._createLineFrame())  
+            # self.seqEditor.window_create('end', window=self.r_frames[-1], stretch=1)
+            self._createLineFrame()
+
+            # This is needed to allow the between-line Frame to be displayed correctly
             self.seqEditor.insert("end", '\n')
         
         # Fill the last blank line with a Frame widget having the same bg color.
-        self.seqEditor.window_create('end', create=self._createLineFrame, stretch=1)
+        self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.texteditor_width, bg="#f5feff"), stretch=1)
 
     def _createLeftFrame(self, func=None):
         # The call back function to create the left Frame widget in the Text
@@ -566,23 +593,22 @@ class WorkingWindow:
 
     def _createLineFrame(self):
         # The call back function to create the between-line Frame widget in the Text
-        self.frame_in_text_Line = Frame(self.seqEditor, width=self.texteditor_width, bg="#f5feff")
-        return self.frame_in_text_Line
+        self.r_frames = []
+        frame_in_text_Line = Frame(self.seqEditor, width=self.texteditor_width, bg="#f5feff")
+        self.r_frames.append(frame_in_text_Line)
+        frame_in_text_Line.pack_propagate(0)  # To make sure the Frame size will not be shrink or expand to fit.
+        self.seqEditor.window_create('end', window=self.r_frames[-1], stretch=1)
+        return None
 
-    def _createLeftLabel(self, frame):
-        # Create Labels on the Left Frame
-        self.label_L = Label(frame, bg="#a5feff")
-        # self.label_L.pack()
-
-    def _createRightLabel(self, frame):
-        # Create Labels on the Right Frame
-        self.label_R = Label(frame, bg="#f5feff", text=self.current_seq_len)
-        self.label_R.pack(padx=(50,0))
+    def _createRightLabel(self):
+        """Create Labels on the Right Frame to display the total sequence length at the end of each line."""
+        self.label_R = Label(self.frame_in_text_R, text=self.current_seq_len, bg="#f5feff")
+        self.label_R.pack(padx=60, side=RIGHT)
+        return self.label_R
 
     def _complement(self, seq):
         # Return the complement sequence of the Seq object.
-        self.seq = seq
-        return self.seq.complement()
+        return seq.complement()
     
     def _reverseComplement(self, seq):
         # Return the reverse complement sequence of the Seq object.
