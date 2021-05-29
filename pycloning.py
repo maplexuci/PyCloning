@@ -108,7 +108,7 @@ class Root:
         self.btn_import = Button(self.root, image=self.import_img, width=35, height=35)
 
         self.lbl_ndf = Label(self.root, text="New DNA File...", bg="#ebf5fc")
-        self.lbl_ndf.bind("<Button-1>", lambda event, : NewDNA(self))  # binding with lambda, needs an 'event' parameter.
+        self.lbl_ndf.bind("<Button-1>", lambda event: NewDNA(self))  # binding with lambda, needs an 'event' parameter.
         self.lbl_npf = Label(self.root, text="New Protein File...", bg="#ebf5fc")
         self.lbl_open = Label(self.root, text="Open", bg="#ebf5fc")
         self.lbl_orf = Label(self.root, text="Open Recent File", bg="#ebf5fc")
@@ -491,14 +491,18 @@ class WorkingWindow:
         self.seqFrame.pack(fill=BOTH, expand=True)
         self.seqFrame.update()
 
+        # Modified the font spacing for the letters (A-Z, a-z) based on Consolas and remaned as ConsolasSeq
         self.seqEditor = scrolledtext.ScrolledText(self.seqFrame, wrap=WORD,
-                                             font=("Consolas", 12), bg="#f5feff")
+                                             font=("ConsolasSeq", 12), bg="#f5feff")
         # 'expand=True' and 'fill=BOTH' ensure that
         # the Text widget change size along with window resizing."
         self.seqEditor.pack(expand=True, fill=BOTH, anchor=W)
 
         # Call _layout() function to layout the sequences and widgets.
         self._layout()
+
+        # Need to improve the the way of inserting cursor in both strands.
+        # self.seqEditor.bind("<Button-1>", self._insertCursor)
 
     def _layout(self):
         """layout the sequences and the widgets in the seqEditor."""
@@ -511,10 +515,10 @@ class WorkingWindow:
         self.R_SPACE_FIX = 160
 
         # Determine the line numbers and characters per line for the input sequence, based on the current window size.
-            ## Size 12 of 'Consolas' font takes 9 pixels per character
+            ## Size 12 of 'ConsolasSeq' font takes 11 pixels per character
             ## The default width of the vertical scrollbar is 16 pixels
-            ## For a full screen with 1920 pixels in width, the remainder of each line is 8 pixels.
-        char_per_line = (self.texteditor_width - 16 - self.L_SPACE_FIX - self.R_SPACE_FIX) // 9
+            ## For a full screen with 1920 pixels in width, the remainder of each line is 3 pixels.
+        char_per_line = (self.texteditor_width - 16 - self.L_SPACE_FIX - self.R_SPACE_FIX) // 11
         row_num = len(self.dnaSeq)//char_per_line
 
         # Initialize the status for counting the total sequence length.
@@ -535,7 +539,7 @@ class WorkingWindow:
             # Determine the total sequence length upto the end of the current line.
             self.current_seq_len = self.current_seq_len + len(row_seq_plus)
 
-            # Determine the index for plus strans and minus strand
+            # Determine the index for plus strand and minus strand
             plus_seq_index = str(row*2+1)+'.0'
             minus_seq_index = str(row*2+2)+'.0'
 
@@ -550,13 +554,13 @@ class WorkingWindow:
             self.seqEditor.insert('end-1c', row_seq_plus)
 
             # Display the right Frame for the plus strand.
-                ## With the fullscreen (1920 pixels in width), for "Consolas size 12" font, the ScrolledText holds 211 characters and remains 5 pixels per line.
-                ## By adding Frames on both end (left frame with 80 pixels and right frame with 160 pixels in width), each line holds 184 characters and remans 8 pixels.
-                ## There is a 3 pixels difference, therefore, 3 pixels need to be added to the right frame width plus the pixels that the blanks take for a not full line.
+                ## With the fullscreen (1920 pixels in width), for "ConsolasSeq size 12" font, the ScrolledText holds 173 characters and remains 1 pixels per line.
+                ## By adding Frames on both end (left frame with 80 pixels and right frame with 160 pixels in width), each line holds 151 characters and remans 3 pixels.
+                ## There is a 2 pixels difference, therefore, 2 pixels need to be added to the right frame width plus the pixels that the blanks take for a not-full line.
                 ## Note: if function for choosing font size is added in the future, the pixel difference need to be recalculated.
-            self.frame_in_text_R = Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff")
+            self.frame_in_text_R = Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*11-2, bg="#f5feff")
             self.seqEditor.window_create('end', window=self.frame_in_text_R, stretch=1)  ## The 'Frame' object is refered here.
-            self.frame_in_text_R.pack_propagate(0)  # To make sure the Frame size will not be shrink or expand to fit.
+            self.frame_in_text_R.pack_propagate(0)  # To make sure the Frame size is not controlled by its children.
             self._createRightLabel()  # Call function to create Label on Frame to display the seqence length.
 
             # Display the left Frame for the minus strand.
@@ -569,7 +573,7 @@ class WorkingWindow:
                 ## Here the 'Frame' object 'self.frame_in_text_R' can not be used again,
                 ## because it was used for the plus strand, otherwise, it will be removed from its first location
                 ## if you used it again and then cause incorrect display.
-            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*9+3, bg="#f5feff"), stretch=1)
+            self.seqEditor.window_create('end', window=Frame(self.seqEditor, width=self.R_SPACE_FIX+remain_seq_len*11-2, bg="#f5feff"), stretch=1)
 
             # Display the between-line Frames.
             # self.r_frames = []
@@ -595,7 +599,7 @@ class WorkingWindow:
         # The call back function to create the between-line Frame widget in the Text
         self.r_frames = []
         frame_in_text_Line = Frame(self.seqEditor, width=self.texteditor_width, bg="#f5feff")
-        self.r_frames.append(frame_in_text_Line)
+        self.r_frames.append(frame_in_text_Line)  # Put all the Frames into a list.
         frame_in_text_Line.pack_propagate(0)  # To make sure the Frame size will not be shrink or expand to fit.
         self.seqEditor.window_create('end', window=self.r_frames[-1], stretch=1)
         return None
@@ -605,6 +609,17 @@ class WorkingWindow:
         self.label_R = Label(self.frame_in_text_R, text=self.current_seq_len, bg="#f5feff")
         self.label_R.pack(padx=60, side=RIGHT)
         return self.label_R
+
+    # Need to improve the strategy for implying this function
+    # def _insertCursor(self, event):
+    #     cursor_top_image = PhotoImage(file="imgs/cursor_top.png")
+    #     cursor_bottom_image = PhotoImage(file="imgs/cursor_bottom.png")
+    #     top_index = CURRENT
+    #     top_index_split = self.seqEditor.index(CURRENT).split(".")
+    #     bottom_index = str(int(top_index_split[0])+1) + "." + str(top_index_split[1])
+    #     self.seqEditor.image_create(top_index, image=cursor_top_image)
+    #     self.seqEditor.image_create(bottom_index, image=cursor_bottom_image)
+        
 
     def _complement(self, seq):
         # Return the complement sequence of the Seq object.
